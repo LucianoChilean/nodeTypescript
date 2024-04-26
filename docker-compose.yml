@@ -1,0 +1,65 @@
+version: '3.8'
+
+
+services:
+
+  app:
+    depends_on:
+      - mysql 
+      - mongo-db
+    build:
+      context: .
+      target: dev
+      dockerfile: Dockerfile
+      
+    volumes:
+      - .:/app/
+      - /app/node_modules
+
+    container_name: prueba_luciano
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      APP_VERSION: ${APP_VERSION}
+      PORT: ${PORT}
+      HOST_API: ${HOST_API}
+      PUBLIC_PATH: ${PUBLIC_PATH}
+      MYSQL_URL: ${MYSQL_URL}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MONGO_URL: ${MONGO_URL}
+      MONGO_DB_NAME: ${MONGO_DB_NAME}
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+      JWT_SEED: ${JWT_SEED}
+      
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    container_name: mysql_DB
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ./mysql:/var/lib/msql
+    ports:
+      - 3306:3306
+
+
+  mongo-db:
+    image: mongo:6.0.6
+    restart: always
+    container_name: logsDB
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - ./mongo:/data/db
+    ports:
+      - 27017:27017
+
+volumes:
+  mysql:
+    external: false
